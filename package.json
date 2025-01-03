@@ -1,0 +1,35 @@
+{
+  "name": "i18n-extract",
+  "version": "1.1.0",
+  "description": "used to extract chinese in a project",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:LuckyFBB/i18n-extract.git"
+  },
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "tsc",
+    "release": "standard-version"
+  },
+  "keywords": [
+    "i18n"
+  ],
+  "author": "LuckyFBB",
+  "license": "ISC",
+  "config": {
+    "commitizen": {
+      "path": "node_modules/git-cz"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^16.2.1",
+    "@commitlint/config-conventional": "^16.2.1",
+    "@commitlint/cz-commitlint": "^16.2.1",
+    "cz-git": "^1.11.0",
+    "git-cz": "^4.9.0",
+    "prettier": "^3.4.2",
+    "standard-version": "^9.5.0",
+    "typescript": "^5.7.2"
+  }
+}
