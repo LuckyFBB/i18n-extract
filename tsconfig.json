@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "resolveJsonModule": true,
-    "declaration": true,
-    "sourceMap": true
-  },
-  "include": ["src/**/*"], // 包含的文件
-  "exclude": ["node_modules", "dist"] // 排除的文件
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "resolveJsonModule": true,
+        "declaration": true,
+        "sourceMap": true
+    },
+    "include": ["src/**/*"], // 包含的文件
+    "exclude": ["node_modules", "dist"] // 排除的文件
 }

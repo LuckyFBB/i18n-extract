@@ -1,1 +1,1 @@
-const extract = "extract";
+const extract = 'extract';
