@@ -35,7 +35,11 @@
         "@commitlint/cli": "^16.2.1",
         "@commitlint/config-conventional": "^16.2.1",
         "@commitlint/cz-commitlint": "^16.2.1",
+        "@types/babel__generator": "^7.6.8",
+        "@types/babel__template": "^7.4.4",
+        "@types/babel__traverse": "^7.20.6",
         "@types/commander": "^2.12.5",
+        "@types/lodash": "^4.17.14",
         "@types/node": "^22.10.5",
         "cz-git": "^1.11.0",
         "git-cz": "^4.9.0",
@@ -46,7 +50,14 @@
         "typescript": "^5.7.2"
     },
     "dependencies": {
+        "@babel/generator": "^7.26.3",
+        "@babel/parser": "^7.26.3",
+        "@babel/template": "^7.25.9",
+        "@babel/traverse": "^7.26.4",
+        "@babel/types": "^7.26.3",
         "chalk": "^4.1.2",
-        "commander": "^13.0.0"
+        "commander": "^13.0.0",
+        "lodash": "^4.17.21",
+        "slash2": "^2.0.0"
     }
 }
