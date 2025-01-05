@@ -1,0 +1,8 @@
+/.vscode/
+*.md
+*.json
+/template/
+/.github/
+pnpm-lock.yaml
+**/build
+**/dist
