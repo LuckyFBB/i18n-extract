@@ -22,8 +22,8 @@ const extract = () => {
     }
     const allFiles = getAllFiles(
         projectConfig.extractDir,
-        projectConfig.ignoreDir,
-        projectConfig.ignoreFile,
+        projectConfig.excludeDir,
+        projectConfig.excludeFile,
     );
     const amount = allFiles.reduce((amount, file) => {
         try {

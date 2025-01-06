@@ -164,8 +164,8 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
         Program: {
             exit(path) {
                 if (count > 0) {
-                    const importI18N = projectConfig.importI18N;
-                    const result = importI18N
+                    const importStatement = projectConfig.importStatement;
+                    const result = importStatement
                         .replace(/^import\s+|\s+from\s+/g, ',')
                         .split(',')
                         .filter(Boolean);
