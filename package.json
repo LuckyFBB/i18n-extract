@@ -1,6 +1,6 @@
 {
-    "name": "i18n-extract",
-    "version": "1.1.0",
+    "name": "i18n-extract-cli",
+    "version": "1.0.0",
     "description": "used to extract chinese in a project",
     "main": "index.js",
     "repository": {
@@ -38,10 +38,8 @@
         "@types/babel__generator": "^7.6.8",
         "@types/babel__template": "^7.4.4",
         "@types/babel__traverse": "^7.20.6",
-        "@types/commander": "^2.12.5",
         "@types/lodash": "^4.17.14",
         "@types/node": "^22.10.5",
-        "cz-git": "^1.11.0",
         "git-cz": "^4.9.0",
         "husky": "^9.1.7",
         "lint-staged": "^15.3.0",

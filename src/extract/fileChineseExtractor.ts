@@ -50,7 +50,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
             count++;
             const key = getSortKey(count, obj);
             setObj(obj, key, value);
-            path.replaceWithMultiple(template.ast(`I18N.${key}`));
+            path.replaceWithMultiple(template.ast(`I18N.${fileKey}.${key}`));
         },
         TemplateLiteral(path) {
             const { node } = path;
@@ -69,7 +69,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                 count++;
                 const key = getSortKey(count, obj);
                 setObj(obj, key, templateContent);
-                path.replaceWithMultiple(template.ast(`I18N.${key}`));
+                path.replaceWithMultiple(template.ast(`I18N.${fileKey}.${key}`));
                 path.skip();
                 return;
             }
@@ -93,7 +93,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
 
             setObj(obj, key, templateContent);
             path.replaceWithMultiple(
-                template.ast(`I18N.get(I18N.${key},{${kvPair.join(',\n')}})`),
+                template.ast(`I18N.get(I18N.${fileKey}.${key},{${kvPair.join(',\n')}})`),
             );
         },
         JSXElement(path) {
@@ -106,7 +106,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                         const key = getSortKey(count, obj);
                         setObj(obj, key, value);
                         const newExpression = babelTypes.jsxExpressionContainer(
-                            babelTypes.identifier(`I18N.${key}`),
+                            babelTypes.identifier(`I18N.${fileKey}.${key}`),
                         );
                         return newExpression;
                     }
@@ -127,7 +127,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                 const expression = babelTypes.jsxExpressionContainer(
                     babelTypes.memberExpression(
                         babelTypes.identifier('I18N'),
-                        babelTypes.identifier(key),
+                        babelTypes.identifier(`${fileKey}.${key}`),
                     ),
                 );
                 node.value = expression;
@@ -148,7 +148,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                         return babelTypes.tsTypeReference(
                             babelTypes.tsQualifiedName(
                                 babelTypes.identifier('I18N'),
-                                babelTypes.identifier(key),
+                                babelTypes.identifier(`${fileKey}.${key}`),
                             ),
                         );
                     }
