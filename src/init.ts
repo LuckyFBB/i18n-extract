@@ -4,9 +4,13 @@ import * as fs from 'fs';
 import { DEFAULT_CONFIG, DEFAULT_CONFIG_FILE } from './const';
 import { successLog, errorLog } from './utils';
 
-const createDefaultConfig = () => {
+const createDefaultConfig = (localeDir: string, extractDir: string) => {
     const configFile = path.resolve(process.cwd(), `${DEFAULT_CONFIG_FILE}`);
-    const config = JSON.stringify({ ...DEFAULT_CONFIG }, null, 4);
+    const config = JSON.stringify(
+        { ...DEFAULT_CONFIG, localeDir, extractDir },
+        null,
+        4,
+    );
 
     if (!fs.existsSync(configFile)) {
         fs.writeFile(configFile, config, (err) => {
@@ -19,8 +23,8 @@ const createDefaultConfig = () => {
     }
 };
 
-const createLocaleFile = () => {
-    const fileDir = `${DEFAULT_CONFIG.localeDir}/zh-CN`;
+const createLocaleFile = (localeDir: string) => {
+    const fileDir = `${localeDir}/zh-CN`;
     if (!fs.existsSync(fileDir)) {
         fs.mkdirSync(fileDir);
         fs.writeFile(`${fileDir}/index.json`, '{}', (err) => {
@@ -33,12 +37,14 @@ const createLocaleFile = () => {
     }
 };
 
-const init = () => {
-    if (!fs.existsSync(DEFAULT_CONFIG.localeDir)) {
-        fs.mkdirSync(DEFAULT_CONFIG.localeDir);
+const init = (localeDir: string, extractDir: string) => {
+    const createLocaleDir = localeDir || DEFAULT_CONFIG.localeDir;
+    const createExtractDir = extractDir || DEFAULT_CONFIG.extractDir;
+    if (!fs.existsSync(createLocaleDir)) {
+        fs.mkdirSync(createLocaleDir);
     }
-    createLocaleFile();
-    createDefaultConfig();
+    createLocaleFile(createLocaleDir);
+    createDefaultConfig(createLocaleDir, createExtractDir);
 };
 
 export default init;

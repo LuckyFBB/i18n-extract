@@ -96,24 +96,15 @@ export const getAllFiles = (
                 const isDirectory = fs.statSync(filePath).isDirectory();
                 const isFile = fs.statSync(filePath).isFile();
                 const isIgnoreDirectory =
-                    ignoreDirs.length &&
+                    !!ignoreDirs.length &&
                     ignoreDirs.some((ignoreDir) =>
-                        path
-                            .dirname(filePath)
-                            .split(path.sep)
-                            .join('/')
-                            .includes(ignoreDir),
+                        filePath.split(path.sep).join('/').includes(ignoreDir),
                     );
                 const isIgnoreFile =
-                    ignoreFiles.length &&
+                    !!ignoreFiles.length &&
                     ignoreFiles.some((ignoreFile) =>
-                        path
-                            .dirname(filePath)
-                            .split(path.sep)
-                            .join('/')
-                            .includes(ignoreFile),
+                        filePath.split(path.sep).join('/').includes(ignoreFile),
                     );
-
                 if (isDirectory && !isIgnoreDirectory) {
                     return files.concat(
                         getAllFiles(filePath, ignoreDirs, ignoreFiles),

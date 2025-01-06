@@ -69,7 +69,9 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                 count++;
                 const key = getSortKey(count, obj);
                 setObj(obj, key, templateContent);
-                path.replaceWithMultiple(template.ast(`I18N.${fileKey}.${key}`));
+                path.replaceWithMultiple(
+                    template.ast(`I18N.${fileKey}.${key}`),
+                );
                 path.skip();
                 return;
             }
@@ -93,7 +95,9 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
 
             setObj(obj, key, templateContent);
             path.replaceWithMultiple(
-                template.ast(`I18N.get(I18N.${fileKey}.${key},{${kvPair.join(',\n')}})`),
+                template.ast(
+                    `I18N.get(I18N.${fileKey}.${key},{${kvPair.join(',\n')}})`,
+                ),
             );
         },
         JSXElement(path) {
