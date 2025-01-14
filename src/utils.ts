@@ -144,11 +144,7 @@ export const getFileKey = (filePath: string) => {
 };
 
 export const setObj = (extractMap = {}, key: string, value: string) => {
-    _.set(
-        extractMap,
-        key,
-        value.replace(/\\n/gm, '\n').replace(/[\n]+/g, ''),
-    );
+    _.set(extractMap, key, value);
 };
 
 /**
