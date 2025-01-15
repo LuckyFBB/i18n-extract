@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.0.2...v1.1.0) (2025-01-15)
+
+
+### Features
+
+* 🎸 support ts/js type and use json5 to parse when ts/js ([a6a8f65](https://github.com/LuckyFBB/i18n-extract/commit/a6a8f65f12f6f277bf6d5e7b7d11d80b5bdafca9))
+
+
+### Bug Fixes
+
+* 🐛 add node_modules into excludeDir and add files ([73118e7](https://github.com/LuckyFBB/i18n-extract/commit/73118e72924417a626fcdc684c33559b856e85c5))
+
 ### [1.0.2](https://github.com/LuckyFBB/i18n-extract/compare/v1.0.1...v1.0.2) (2025-01-14)
 
 
