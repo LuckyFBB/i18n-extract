@@ -152,12 +152,20 @@ export const setObj = (extractMap = {}, key: string, value: string) => {
  * @param {string} filePath - 文件的完整路径
  * @param {string} [content=''] - 文件的初始内容
  */
-export const createFileAndDirectories = (filePath: string, content = '') => {
-    const directory = path.dirname(filePath);
+export const createFileAndDirectories = (content = '') => {
+    const { localeDir, type } = getProjectConfig();
+    const fileType = type || 'json';
+    const targetFilename = path.join(localeDir, `zh-CN/index.${fileType}`);
+    const directory = path.dirname(targetFilename);
 
     if (!fs.existsSync(directory)) {
         fs.mkdirSync(directory, { recursive: true });
     }
 
-    fs.writeFileSync(filePath, content, 'utf8');
+    if (['ts', 'js'].includes(fileType)) {
+        fs.writeFileSync(targetFilename, `export default ${content}`, 'utf8');
+        return;
+    }
+
+    fs.writeFileSync(targetFilename, content, 'utf8');
 };

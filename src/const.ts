@@ -6,4 +6,5 @@ export const DEFAULT_CONFIG = {
     importStatement: 'import I18N from @/utils/i18n',
     excludeFile: [],
     excludeDir: [],
+    type: 'ts',
 };
