@@ -7,6 +7,7 @@
         "type": "git",
         "url": "git@github.com:LuckyFBB/i18n-extract.git"
     },
+   "files": ["dist/**/*"],
     "scripts": {
         "dev": "tsc -w",
         "build": "tsc",

@@ -5,6 +5,6 @@ export const DEFAULT_CONFIG = {
     extractDir: './',
     importStatement: 'import I18N from @/utils/i18n',
     excludeFile: [],
-    excludeDir: [],
+    excludeDir: ['node_modules'],
     type: 'ts',
 };
