@@ -49,7 +49,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
             }
             count++;
             const key = getSortKey(count, obj);
-            setObj(obj, key, value.replace(/\\n/gm, '\n'));
+            setObj(obj, key, value);
             path.replaceWithMultiple(template.ast(`I18N.${fileKey}.${key}`));
         },
         TemplateLiteral(path) {
@@ -68,7 +68,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
             if (!node.expressions.length) {
                 count++;
                 const key = getSortKey(count, obj);
-                setObj(obj, key, templateContent.replace(/\\n/gm, '\n'));
+                setObj(obj, key, templateContent);
                 path.replaceWithMultiple(
                     template.ast(`I18N.${fileKey}.${key}`),
                 );
@@ -93,7 +93,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
             count++;
             const key = getSortKey(count, obj);
 
-            setObj(obj, key, templateContent.replace(/\\n/gm, '\n'));
+            setObj(obj, key, templateContent);
             path.replaceWithMultiple(
                 template.ast(
                     `I18N.get(I18N.${fileKey}.${key},{${kvPair.join(',\n')}})`,
@@ -108,10 +108,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                     if (value.match(DOUBLE_BYTE_REGEX)) {
                         count++;
                         const key = getSortKey(count, obj);
-                        const newValue = value
-                            .replace(/\\n/gm, '\n')
-                            .replace(/[\n\s]+/g, '');
-                        setObj(obj, key, newValue);
+                        setObj(obj, key, value);
                         const newExpression = babelTypes.jsxExpressionContainer(
                             babelTypes.identifier(`I18N.${fileKey}.${key}`),
                         );
@@ -130,10 +127,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
             ) {
                 count++;
                 const key = getSortKey(count, obj);
-                const newValue = node.value.value
-                    .replace(/\\n/gm, '\n')
-                    .replace(/[\n\s]+/g, '');
-                setObj(obj, key, newValue);
+                setObj(obj, key, node.value.value);
                 const expression = babelTypes.jsxExpressionContainer(
                     babelTypes.memberExpression(
                         babelTypes.identifier('I18N'),
@@ -154,7 +148,7 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                     if (value.match(DOUBLE_BYTE_REGEX)) {
                         count++;
                         const key = getSortKey(count, obj);
-                        setObj(obj, key, value.replace(/\\n/gm, '\n'));
+                        setObj(obj, key, value);
                         return babelTypes.tsTypeReference(
                             babelTypes.tsQualifiedName(
                                 babelTypes.identifier('I18N'),
