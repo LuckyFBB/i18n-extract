@@ -100,24 +100,16 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                 ),
             );
         },
-        JSXElement(path) {
-            const children = path.node.children;
-            const newChild = children.map((child) => {
-                if (babelTypes.isJSXText(child)) {
-                    const { value } = child;
-                    if (value.match(DOUBLE_BYTE_REGEX)) {
-                        count++;
-                        const key = getSortKey(count, obj);
-                        setObj(obj, key, value);
-                        const newExpression = babelTypes.jsxExpressionContainer(
-                            babelTypes.identifier(`I18N.${fileKey}.${key}`),
-                        );
-                        return newExpression;
-                    }
-                }
-                return child;
-            });
-            path.node.children = newChild;
+        JSXText(path) {
+            const { value } = path.node;
+            if (value.match(DOUBLE_BYTE_REGEX)) {
+                count++;
+                const key = getSortKey(count, obj);
+                setObj(obj, key, value);
+                path.replaceWithMultiple(
+                    babelTypes.identifier(`{I18N.${fileKey}.${key}}`),
+                );
+            }
         },
         JSXAttribute(path) {
             const { node } = path;
