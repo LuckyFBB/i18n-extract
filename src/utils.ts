@@ -147,7 +147,7 @@ export const setObj = (extractMap = {}, key: string, value: string) => {
     _.set(
         extractMap,
         key,
-        value.replace(/\\n/gm, '\n').replace(/(?<!\n)\n(?!\n)\s*/g, '')
+        value.replace(/\\n/gm, '\n').replace(/(?<!\n)\n(?!\n)\s+|^\n\s+/g, '')
     );
 };
 

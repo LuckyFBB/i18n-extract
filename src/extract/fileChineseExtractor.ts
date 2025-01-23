@@ -81,8 +81,16 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
                 return sourceCode.slice(start, end);
             });
             const kvPair = expressions.map((expression, index) => {
+                const escapedExpression = expression?.replace(
+                    /[.*+?^${}()|[\]\\]/g,
+                    '\\$&',
+                );
+                const regex = new RegExp(
+                    `\\$\\{\\s*${escapedExpression}\\s*\\}`,
+                    'g',
+                );
                 templateContent = templateContent.replace(
-                    `\${${expression}}`,
+                    regex,
                     `{val${index + 1}}`,
                 );
                 return `val${index + 1}: ${expression}`;
