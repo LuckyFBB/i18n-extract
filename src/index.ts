@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { input } from '@inquirer/prompts';
 import initProject from './init';
 import extract from './extract';
+import zhCheck from './extract/check';
 
 const program = new Command();
 
@@ -25,6 +26,13 @@ program
     .description('extract chinese from project')
     .action(() => {
         extract();
+    });
+
+program
+    .command('extract:check')
+    .description('check chinese in files')
+    .action(() => {
+        zhCheck();
     });
 
 program.parse(process.argv);

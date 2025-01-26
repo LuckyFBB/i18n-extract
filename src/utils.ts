@@ -19,6 +19,13 @@ export const successLog = (message: string) => {
 /**
  * @param message 需要打印的信息
  */
+export const infoLog = (message: string) => {
+    console.log(chalk.gray(message));
+};
+
+/**
+ * @param message 需要打印的信息
+ */
 export const errorLog = (message: string) => {
     console.log(chalk.red(message));
 };
@@ -147,7 +154,7 @@ export const setObj = (extractMap = {}, key: string, value: string) => {
     _.set(
         extractMap,
         key,
-        value.replace(/\\n/gm, '\n').replace(/(?<!\n)\n(?!\n)\s+|^\n\s+/g, '')
+        value.replace(/\\n/gm, '\n').replace(/(?<!\n)\n(?!\n)\s+|^\n\s+/g, ''),
     );
 };
 
