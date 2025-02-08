@@ -42,8 +42,11 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
             const { value } = node;
             if (
                 !value.match(DOUBLE_BYTE_REGEX) ||
-                (path.parentPath.node.type === 'CallExpression' &&
-                    path.parentPath.toString().includes('console'))
+                (babelTypes.isCallExpression(path.parent) &&
+                    babelTypes.isMemberExpression(path.parent.callee) &&
+                    babelTypes.isIdentifier(path.parent.callee.object, {
+                        name: 'console',
+                    }))
             ) {
                 return;
             }
@@ -59,9 +62,12 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
             let templateContent = sourceCode.slice(start + 1, end - 1);
             if (
                 !templateContent.match(DOUBLE_BYTE_REGEX) ||
-                (path.parentPath.node.type === 'CallExpression' &&
-                    path.parentPath.toString().includes('console')) ||
-                path.parentPath.node.type === 'TaggedTemplateExpression'
+                (babelTypes.isCallExpression(path.parent) &&
+                    babelTypes.isMemberExpression(path.parent.callee) &&
+                    babelTypes.isIdentifier(path.parent.callee.object, {
+                        name: 'console',
+                    })) ||
+                babelTypes.isTaggedTemplateExpression(path.parent)
             ) {
                 return;
             }

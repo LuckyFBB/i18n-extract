@@ -35,7 +35,7 @@ const zhCheck = () => {
             errorLog(`所在文件: ${filePath}\n`);
         }
     });
-    hasZh && process.exit(1);
+    hasZh ? process.exit(1) : infoLog('未检测到中文字符');
 };
 
 export default zhCheck;
