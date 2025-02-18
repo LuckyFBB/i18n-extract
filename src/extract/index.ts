@@ -12,7 +12,7 @@ import { fileChineseExtractor } from './fileChineseExtractor';
 const projectConfig = getProjectConfig();
 
 const extract = () => {
-    const fileType = projectConfig.type || 'json';
+    const fileType = projectConfig.type || 'ts';
     const targetFilename = path.join(
         projectConfig.localeDir,
         `zh-CN/index.${fileType}`,
