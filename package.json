@@ -1,6 +1,6 @@
 {
     "name": "i18n-extract-cli",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "used to extract chinese in a project",
     "main": "index.js",
     "repository": {

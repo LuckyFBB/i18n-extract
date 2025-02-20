@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.1.0...v1.2.0) (2025-02-20)
+
+
+### Features
+
+* 🎸 support zh check by regex ([#1](https://github.com/LuckyFBB/i18n-extract/issues/1)) ([c244dc6](https://github.com/LuckyFBB/i18n-extract/commit/c244dc6b359af70cbd6046e3df091778c8369edf))
+
+
+### Bug Fixes
+
+* 🐛 add info for check and change judge console ([e6e7046](https://github.com/LuckyFBB/i18n-extract/commit/e6e704604a91a39b150d399c62094c917700079c))
+* 🐛 change default type to ts ([3ad8cfd](https://github.com/LuckyFBB/i18n-extract/commit/3ad8cfdc3469b2f713a60c1957b13f67e782bdaa))
+* 🐛 change reg not replace ([4cf4c3f](https://github.com/LuckyFBB/i18n-extract/commit/4cf4c3f5e9bbd03c1f530966bc54406d72eaaebb))
+* 🐛 handle line breaks in text, perttier expression line breaks ([37a10d4](https://github.com/LuckyFBB/i18n-extract/commit/37a10d4496ffffce6252286541a47091db02d31d))
+* 🐛 reserve ([297352d](https://github.com/LuckyFBB/i18n-extract/commit/297352dd194761f0ef776313a65ff7e5759eaf94))
+* 🐛 use JsxText replace JsxElement ([55cd7fb](https://github.com/LuckyFBB/i18n-extract/commit/55cd7fb4a514959ecea5b0a118941c86a82ee53d))
+* 🐛 zh check include string and exit when zh exist ([9584b99](https://github.com/LuckyFBB/i18n-extract/commit/9584b9966bed11c76139432f5c3185a857a75074))
+
 ## [1.1.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.0.2...v1.1.0) (2025-01-15)
 
 
