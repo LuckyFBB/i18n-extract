@@ -5,6 +5,7 @@ import { Command } from 'commander';
 import extract from './extract';
 import validateI18nCoverage from './extract/check';
 import init from './init';
+import clear from './extract/clear';
 
 const program = new Command();
 
@@ -19,5 +20,10 @@ program
     .command('extract:check')
     .description('check chinese in files')
     .action(validateI18nCoverage);
+
+program
+    .command('extract:clear')
+    .description('clear unused chinese in locale file')
+    .action(clear);
 
 program.parse(process.argv);
