@@ -4,6 +4,9 @@ import slash from 'slash2';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as json5 from 'json5';
+import { parse } from '@babel/parser';
+import traverse from '@babel/traverse';
+import { isIdentifier, isObjectExpression } from '@babel/types';
 
 import {
     DEFAULT_CONFIG,
@@ -209,4 +212,77 @@ export const parseLocaleFile = (targetFilename: string, fileType: string) => {
         }
     }
     return extractMap;
+};
+
+/**
+ * 获取语言目录下的所有语言文件夹
+ * @param directoryPath 语言目录路径
+ * @returns 返回语言文件夹数组，如 ['zh-CN', 'en-US']
+ */
+export const getSubDirectories = async (
+    directoryPath: string,
+): Promise<string[]> => {
+    if (!fs.existsSync(directoryPath)) {
+        return Promise.reject(`不存在 ${directoryPath} 文件夹`);
+    }
+    return fs
+        .readdirSync(directoryPath)
+        .filter((name) =>
+            fs.statSync(path.join(directoryPath, name)).isDirectory(),
+        );
+};
+
+/**
+ * 解析语言模块文件并提取导出的对象
+ * @param filePath 语言模块文件路径
+ * @returns Record<string, any> 返回模块中导出的语言键值对对象
+ */
+export const parseLocaleModule = (filePath: string) => {
+    const code = fs.readFileSync(filePath, 'utf-8');
+
+    const ast = parse(code, {
+        sourceType: 'module',
+        plugins: ['typescript'],
+    });
+
+    let exportIdentifier: string = '';
+    let exportData: Record<string, any> = {};
+
+    traverse(ast, {
+        ExportDefaultDeclaration(path) {
+            const declaration = path.node.declaration;
+            if (isIdentifier(declaration)) {
+                exportIdentifier = declaration.name;
+            }
+            if (isObjectExpression(declaration)) {
+                exportData = eval(
+                    `(${code.slice(declaration.start ?? 0, declaration.end ?? 0)})`,
+                );
+            }
+        },
+    });
+
+    if (!exportIdentifier && !Object.keys(exportData).length) {
+        return Promise.reject(`解析${filePath}文件失败`);
+    }
+
+    traverse(ast, {
+        VariableDeclarator(path) {
+            if (
+                path.node.id.type === 'Identifier' &&
+                path.node.id.name === exportIdentifier
+            ) {
+                if (
+                    path.node.init &&
+                    path.node.init.type === 'ObjectExpression'
+                ) {
+                    exportData = eval(
+                        `(${code.slice(path.node.init.start ?? 0, path.node.init.end ?? 0)})`,
+                    );
+                }
+            }
+        },
+    });
+
+    return Promise.resolve(exportData);
 };

@@ -9,10 +9,12 @@ import {
     generateLocaleKey,
     getFilteredFiles,
     getProjectConfig,
-    parseLocaleFile,
+    getSubDirectories,
+    parseLocaleModule,
     success,
     updateLocaleFile,
 } from '../utils';
+import { LOCALE_FILE_TYPES } from '../const';
 
 const projectConfig = getProjectConfig();
 
@@ -104,30 +106,38 @@ const processSourceFile = (
     return 0;
 };
 
-const clear = () => {
-    const fileType = projectConfig.type || 'ts';
-    const targetFilename = path.join(
-        projectConfig.localeDir,
-        `${projectConfig.sourceLocale}/index.${fileType}`,
-    );
-    const extractMap = parseLocaleFile(targetFilename, fileType);
+const clear = async () => {
+    const fileType = projectConfig.type || LOCALE_FILE_TYPES.JS;
+
     const allFiles = getFilteredFiles(
         projectConfig.extractDir,
         projectConfig.excludeDir,
         projectConfig.excludeFile,
     );
+    const subDirs = await getSubDirectories(projectConfig.localeDir);
 
-    const amount = allFiles.reduce((amount, file) => {
-        try {
-            const curr = processSourceFile(file, extractMap);
-            return amount + curr;
-        } catch (error: any) {
+    subDirs.map((lang) => {
+        const filePath = path.join(
+            projectConfig.localeDir,
+            `${lang}/index.${fileType}`,
+        );
+        parseLocaleModule(filePath).then((extractMap) => {
+            const amount = allFiles.reduce((amount, file) => {
+                try {
+                    const curr = processSourceFile(file, extractMap);
+                    return amount + curr;
+                } catch (error: any) {
+                    updateLocaleFile(`${JSON.stringify(extractMap, null, 4)}`);
+                    throw new Error(
+                        `${filePath} 移除文案失败, ${error.message}`,
+                    );
+                }
+            }, 0);
+            success(`共移除${amount}个文案！`);
+            // TODO: 如果不是直接 export default 语言键值对对象，需要转换一下
             updateLocaleFile(`${JSON.stringify(extractMap, null, 4)}`);
-            throw new Error(`${file} 移除文案失败, ${error.message}`);
-        }
-    }, 0);
-    success(`共移除${amount}个文案！`);
-    updateLocaleFile(`${JSON.stringify(extractMap, null, 4)}`);
+        });
+    });
 };
 
 export default clear;

@@ -23,7 +23,7 @@ program
 
 program
     .command('extract:clear')
-    .description('clear unused chinese in locale file')
+    .description('clear unused key in locale file')
     .action(clear);
 
 program.parse(process.argv);
