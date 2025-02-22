@@ -1,38 +1,23 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { input } from '@inquirer/prompts';
-import initProject from './init';
+
 import extract from './extract';
 import validateI18nCoverage from './extract/check';
+import init from './init';
 
 const program = new Command();
 
-program
-    .command('init')
-    .description('init default config')
-    .action(async () => {
-        const localeDir = await input({
-            message: '请输入国际化文件夹(默认为 locales)',
-        });
-        const extractDir = await input({
-            message: '请输入提取中文的文件夹(默认为当前路径)',
-        });
-        initProject(localeDir, extractDir);
-    });
+program.command('init').description('init default config').action(init);
 
 program
     .command('extract')
     .description('extract chinese from project')
-    .action(() => {
-        extract();
-    });
+    .action(extract);
 
 program
     .command('extract:check')
     .description('check chinese in files')
-    .action(() => {
-        validateI18nCoverage();
-    });
+    .action(validateI18nCoverage);
 
 program.parse(process.argv);

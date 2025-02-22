@@ -4,7 +4,11 @@ import slash from 'slash2';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { DEFAULT_CONFIG, DEFAULT_CONFIG_FILE } from './const';
+import {
+    DEFAULT_CONFIG,
+    DEFAULT_CONFIG_FILE,
+    LOCALE_FILE_TYPES,
+} from './const';
 
 /** unicode cjk 中日韩文 范围 */
 export const DOUBLE_BYTE_REGEX = /[\u4E00-\u9FFF]/g;
@@ -163,16 +167,19 @@ export const setLocaleValue = (extractMap = {}, key: string, value: string) => {
  * @param {string} content - 要写入的国际化内容
  */
 export const updateLocaleFile = (content = '') => {
-    const { localeDir, type } = getProjectConfig();
-    const fileType = type || 'ts';
-    const targetFilename = path.join(localeDir, `zh-CN/index.${fileType}`);
+    const { localeDir, type, sourceLocale } = getProjectConfig();
+    const fileType = type || LOCALE_FILE_TYPES.TS;
+    const targetFilename = path.join(
+        localeDir,
+        `${sourceLocale}/index.${fileType}`,
+    );
     const directory = path.dirname(targetFilename);
 
     if (!fs.existsSync(directory)) {
         fs.mkdirSync(directory, { recursive: true });
     }
 
-    if (['ts', 'js'].includes(fileType)) {
+    if ([LOCALE_FILE_TYPES.TS, LOCALE_FILE_TYPES.JS].includes(fileType)) {
         fs.writeFileSync(targetFilename, `export default ${content}`, 'utf8');
         return;
     }

@@ -18,6 +18,7 @@ import {
     setLocaleValue,
     getSortKey,
 } from '../utils';
+import { LOCALE_FILE_TYPES } from '../const';
 
 const projectConfig = getProjectConfig();
 
@@ -231,15 +232,15 @@ export const extractI18nByFileType = (fileName: string, extractMap: any) => {
 };
 
 const extract = () => {
-    const fileType = projectConfig.type || 'ts';
+    const fileType = projectConfig.type || LOCALE_FILE_TYPES.TS;
     const targetFilename = path.join(
         projectConfig.localeDir,
-        `zh-CN/index.${fileType}`,
+        `${projectConfig.sourceLocale}/index.${fileType}`,
     );
     let extractMap = {};
     if (fs.existsSync(targetFilename)) {
         const content = fs.readFileSync(targetFilename, 'utf-8') ?? '{}';
-        if (['ts', 'js'].includes(fileType)) {
+        if ([LOCALE_FILE_TYPES.TS, LOCALE_FILE_TYPES.JS].includes(fileType)) {
             const modifiedContent = content.replace(
                 /^export default\s*({[\s\S]*})\s*;?/,
                 '$1',
