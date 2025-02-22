@@ -7,6 +7,7 @@ import * as babelTypes from '@babel/types';
 import generate from '@babel/generator';
 import template from '@babel/template';
 import _ from 'lodash';
+
 import {
     DOUBLE_BYTE_REGEX,
     updateLocaleFile,
@@ -17,6 +18,7 @@ import {
     error,
     setLocaleValue,
     getSortKey,
+    parseLocaleFile,
 } from '../utils';
 import { LOCALE_FILE_TYPES } from '../const';
 
@@ -37,10 +39,10 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
     });
 
     const fileKey = generateLocaleKey(fileName);
-
     const obj: {} = _.get(extractMap, fileKey) ?? {};
     let haveMoreTemplate = false;
     let count = 0;
+
     babelTraverse(ast, {
         StringLiteral(path) {
             const { node } = path;
@@ -111,7 +113,6 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
             }
             count++;
             const key = getSortKey(count, obj);
-
             setLocaleValue(obj, key, templateContent);
             path.replaceWithMultiple(
                 template.ast(
@@ -237,19 +238,7 @@ const extract = () => {
         projectConfig.localeDir,
         `${projectConfig.sourceLocale}/index.${fileType}`,
     );
-    let extractMap = {};
-    if (fs.existsSync(targetFilename)) {
-        const content = fs.readFileSync(targetFilename, 'utf-8') ?? '{}';
-        if ([LOCALE_FILE_TYPES.TS, LOCALE_FILE_TYPES.JS].includes(fileType)) {
-            const modifiedContent = content.replace(
-                /^export default\s*({[\s\S]*})\s*;?/,
-                '$1',
-            );
-            extractMap = json5.parse(modifiedContent);
-        } else {
-            extractMap = JSON.parse(content);
-        }
-    }
+    const extractMap = parseLocaleFile(targetFilename, fileType);
     const filteredFiles = getFilteredFiles(
         projectConfig.extractDir,
         projectConfig.excludeDir,

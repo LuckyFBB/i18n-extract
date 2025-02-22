@@ -3,6 +3,7 @@ import _ from 'lodash';
 import slash from 'slash2';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as json5 from 'json5';
 
 import {
     DEFAULT_CONFIG,
@@ -185,4 +186,27 @@ export const updateLocaleFile = (content = '') => {
     }
 
     fs.writeFileSync(targetFilename, content, 'utf8');
+};
+
+/**
+ * 解析 locale 文件
+ * @param targetFilename string
+ * @param fileType string
+ * @returns Record<string, any>
+ */
+export const parseLocaleFile = (targetFilename: string, fileType: string) => {
+    let extractMap = {};
+    if (fs.existsSync(targetFilename)) {
+        const content = fs.readFileSync(targetFilename, 'utf-8') ?? '{}';
+        if (['ts', 'js'].includes(fileType)) {
+            const modifiedContent = content.replace(
+                /^export default\s*({[\s\S]*})\s*;?/,
+                '$1',
+            );
+            extractMap = json5.parse(modifiedContent);
+        } else {
+            extractMap = JSON.parse(content);
+        }
+    }
+    return extractMap;
 };
