@@ -12,21 +12,21 @@ export const DOUBLE_BYTE_REGEX = /[\u4E00-\u9FFF]/g;
 /**
  * @param message 需要打印的信息
  */
-export const successLog = (message: string) => {
+export const success = (message: string) => {
     console.log(chalk.green(message));
 };
 
 /**
  * @param message 需要打印的信息
  */
-export const infoLog = (message: string) => {
+export const info = (message: string) => {
     console.log(chalk.gray(message));
 };
 
 /**
  * @param message 需要打印的信息
  */
-export const errorLog = (message: string) => {
+export const error = (message: string) => {
     console.log(chalk.red(message));
 };
 
@@ -73,7 +73,7 @@ export function isDirectory(path: string) {
     return fs.statSync(path).isDirectory();
 }
 
-function removeLangsFiles(files: string[]) {
+function excludeLocaleFiles(files: string[]) {
     const langsDir = path.resolve(process.cwd(), getProjectConfig().extractDir);
     return files.filter((file) => {
         const completeFile = path.resolve(process.cwd(), file);
@@ -87,7 +87,7 @@ function removeLangsFiles(files: string[]) {
  * @param ignoreDirs 忽略的文件夹
  * @param ignoreFiles 忽略的文件
  */
-export const getAllFiles = (
+export const getFilteredFiles = (
     dir: string,
     ignoreDirs: string[] = [],
     ignoreFiles: string[] = [],
@@ -114,7 +114,7 @@ export const getAllFiles = (
                     );
                 if (isDirectory && !isIgnoreDirectory) {
                     return files.concat(
-                        getAllFiles(filePath, ignoreDirs, ignoreFiles),
+                        getFilteredFiles(filePath, ignoreDirs, ignoreFiles),
                     );
                 }
 
@@ -125,7 +125,7 @@ export const getAllFiles = (
                 return files;
             }, []);
     } else {
-        files = removeLangsFiles(dir.split(','));
+        files = excludeLocaleFiles(dir.split(','));
     }
     return files;
 };
@@ -135,7 +135,7 @@ export const getAllFiles = (
  * @param filePath 当前文件绝对路径
  * @returns array
  */
-export const getFileKey = (filePath: string) => {
+export const generateLocaleKey = (filePath: string) => {
     const extractDir = getProjectConfig().extractDir;
 
     const basePath = path.resolve(process.cwd(), extractDir);
@@ -150,7 +150,7 @@ export const getFileKey = (filePath: string) => {
     return fileKey.replace(/-/g, '_');
 };
 
-export const setObj = (extractMap = {}, key: string, value: string) => {
+export const setLocaleValue = (extractMap = {}, key: string, value: string) => {
     _.set(
         extractMap,
         key,
@@ -159,13 +159,12 @@ export const setObj = (extractMap = {}, key: string, value: string) => {
 };
 
 /**
- * 创建文件及其目录
- * @param {string} filePath - 文件的完整路径
- * @param {string} [content=''] - 文件的初始内容
+ * 创建或更新国际化资源文件
+ * @param {string} content - 要写入的国际化内容
  */
-export const createFileAndDirectories = (content = '') => {
+export const updateLocaleFile = (content = '') => {
     const { localeDir, type } = getProjectConfig();
-    const fileType = type || 'json';
+    const fileType = type || 'ts';
     const targetFilename = path.join(localeDir, `zh-CN/index.${fileType}`);
     const directory = path.dirname(targetFilename);
 

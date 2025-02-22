@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { input } from '@inquirer/prompts';
 import initProject from './init';
 import extract from './extract';
-import zhCheck from './extract/check';
+import validateI18nCoverage from './extract/check';
 
 const program = new Command();
 
@@ -32,7 +32,7 @@ program
     .command('extract:check')
     .description('check chinese in files')
     .action(() => {
-        zhCheck();
+        validateI18nCoverage();
     });
 
 program.parse(process.argv);

@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import { errorLog, getAllFiles, getProjectConfig, infoLog } from '../utils';
+import { error, getFilteredFiles, getProjectConfig, info } from '../utils';
 
 const projectConfig = getProjectConfig();
 
-const zhCheck = () => {
-    const allFiles = getAllFiles(
+const validateI18nCoverage = () => {
+    const allFiles = getFilteredFiles(
         projectConfig.extractDir,
         projectConfig.excludeDir,
         projectConfig.excludeFile,
@@ -31,11 +31,11 @@ const zhCheck = () => {
             hasZh = true;
             const zhArr = cleanedContent.match(zhRegex);
 
-            infoLog(`检测到中文字符：${JSON.stringify(zhArr)}`);
-            errorLog(`所在文件: ${filePath}\n`);
+            info(`检测到中文字符：${JSON.stringify(zhArr)}`);
+            error(`所在文件: ${filePath}\n`);
         }
     });
-    hasZh ? process.exit(1) : infoLog('未检测到中文字符');
+    hasZh ? process.exit(1) : info('未检测到中文字符');
 };
 
-export default zhCheck;
+export default validateI18nCoverage;

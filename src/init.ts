@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { DEFAULT_CONFIG, DEFAULT_CONFIG_FILE } from './const';
-import { successLog, errorLog } from './utils';
+import { success, error } from './utils';
 
 const createDefaultConfig = (localeDir: string, extractDir: string) => {
     const configFile = path.resolve(process.cwd(), `${DEFAULT_CONFIG_FILE}`);
@@ -15,10 +15,10 @@ const createDefaultConfig = (localeDir: string, extractDir: string) => {
     if (!fs.existsSync(configFile)) {
         fs.writeFile(configFile, config, (err) => {
             if (err) {
-                errorLog('创建 i18n.config.json 失败');
+                error('创建 i18n.config.json 失败');
                 return;
             }
-            successLog('创建 i18n.config.json 成功');
+            success('创建 i18n.config.json 成功');
         });
     }
 };
@@ -29,10 +29,10 @@ const createLocaleFile = (localeDir: string) => {
         fs.mkdirSync(fileDir);
         fs.writeFile(`${fileDir}/index.json`, '{}', (err) => {
             if (err) {
-                errorLog('创建国际化文件失败');
+                error('创建国际化文件失败');
                 return;
             }
-            successLog('创建国际化文件成功');
+            success('创建国际化文件成功');
         });
     }
 };
