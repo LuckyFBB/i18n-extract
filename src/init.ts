@@ -48,7 +48,9 @@ const createLocaleFile = ({
     const fileDir = `${localeDir}/${sourceLocale}`;
     if (!fs.existsSync(fileDir)) {
         fs.mkdirSync(fileDir);
-        fs.writeFile(`${fileDir}/index.${type}`, '{}', (err) => {
+        const fileContent =
+            type === LOCALE_FILE_TYPES.JSON ? '{}' : 'export default {}';
+        fs.writeFile(`${fileDir}/index.${type}`, fileContent, (err) => {
             if (err) {
                 error('创建国际化文件失败');
                 return;
