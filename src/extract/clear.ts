@@ -81,16 +81,24 @@ const extractI18nFromScript = (
             if (babelTypes.isIdentifier(node)) {
                 identifiers.unshift((node as babelTypes.Identifier).name);
             }
-            if (identifiers.at(0) === importVariable) {
+            if (
+                identifiers.at(0) === importVariable &&
+                !(
+                    identifiers.at(1) === 'get' &&
+                    babelTypes.isCallExpression(path.parentPath.node)
+                )
+            ) {
                 keySet.add(identifiers[identifiers.length - 1]);
+                path.skip();
             }
-            path.skip();
         },
     });
 
-    const newObj: Record<string, any> = {};
-    keySet.forEach((key) => {
-        newObj[key] = currObj[key];
+    const newObj: Record<string, any> = currObj;
+    Object.keys(currObj).forEach((key) => {
+        if (!keySet.has(key)) {
+            delete newObj[key];
+        }
     });
     _.set(extractMap, fileKey, newObj);
 
