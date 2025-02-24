@@ -1,6 +1,5 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import * as json5 from 'json5';
 import { parse, ParserOptions } from '@babel/parser';
 import babelTraverse from '@babel/traverse';
 import * as babelTypes from '@babel/types';
@@ -10,7 +9,7 @@ import _ from 'lodash';
 
 import {
     DOUBLE_BYTE_REGEX,
-    updateLocaleFile,
+    updateLocaleContent,
     getFilteredFiles,
     generateLocaleKey,
     getProjectConfig,
@@ -18,13 +17,20 @@ import {
     error,
     setLocaleValue,
     getSortKey,
-    parseLocaleFile,
+    parseLocaleModule,
 } from '../utils';
-import { LOCALE_FILE_TYPES } from '../const';
 
-const projectConfig = getProjectConfig();
+const {
+    type,
+    sourceLocale,
+    localeDir,
+    extractDir,
+    excludeDir,
+    excludeFile,
+    importStatement,
+} = getProjectConfig();
 
-const jsChineseExtractor = (fileName: string, extractMap: any) => {
+const extractI18nFromScript = (fileName: string, extractMap: any) => {
     const sourceCode = fs.readFileSync(fileName, 'utf-8');
     const plugins: ParserOptions['plugins'] = [
         'decorators-legacy',
@@ -176,7 +182,6 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
         Program: {
             exit(path) {
                 if (count > 0) {
-                    const importStatement = projectConfig.importStatement;
                     const result = importStatement
                         .replace(/^import\s+|\s+from\s+/g, ',')
                         .split(',')
@@ -220,41 +225,31 @@ const jsChineseExtractor = (fileName: string, extractMap: any) => {
     return count;
 };
 
-export const extractI18nByFileType = (fileName: string, extractMap: any) => {
-    if (
-        fileName.endsWith('.js') ||
-        fileName.endsWith('.ts') ||
-        fileName.endsWith('.jsx') ||
-        fileName.endsWith('.tsx')
-    ) {
-        return jsChineseExtractor(fileName, extractMap);
+const extractI18nByFileType = (fileName: string, extractMap: any) => {
+    if (['.js', '.ts', '.jsx', '.tsx'].some((ext) => fileName.endsWith(ext))) {
+        return extractI18nFromScript(fileName, extractMap);
     }
     return 0;
 };
 
-const extract = () => {
-    const fileType = projectConfig.type || LOCALE_FILE_TYPES.TS;
+const extract = async () => {
     const targetFilename = path.join(
-        projectConfig.localeDir,
-        `${projectConfig.sourceLocale}/index.${fileType}`,
+        localeDir,
+        `${sourceLocale}/index.${type}`,
     );
-    const extractMap = parseLocaleFile(targetFilename, fileType);
-    const filteredFiles = getFilteredFiles(
-        projectConfig.extractDir,
-        projectConfig.excludeDir,
-        projectConfig.excludeFile,
-    );
+    const extractMap = await parseLocaleModule(targetFilename);
+    const filteredFiles = getFilteredFiles(extractDir, excludeDir, excludeFile);
     const amount = filteredFiles.reduce((amount, file) => {
         try {
             const curr = extractI18nByFileType(file, extractMap);
             return amount + curr;
         } catch (error: any) {
-            updateLocaleFile(`${JSON.stringify(extractMap, null, 4)}`);
+            updateLocaleContent(extractMap);
             throw new Error(`${file} 提取文案失败, ${error.message}`);
         }
     }, 0);
     success(`共提取${amount}处文案！`);
-    updateLocaleFile(`${JSON.stringify(extractMap, null, 4)}`);
+    updateLocaleContent(extractMap);
 };
 
 export default extract;
