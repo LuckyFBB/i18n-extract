@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { parse, ParserOptions } from '@babel/parser';
 import babelTraverse from '@babel/traverse';
 import * as babelTypes from '@babel/types';
+import generate from '@babel/generator';
 
 import {
     generateLocaleKey,
@@ -49,6 +50,7 @@ const extractI18nFromScript = (
     const currObj = _.get(extractMap, fileKey);
     if (!currObj) return 0;
     const keySet = new Set<string>();
+    let removeI18N = false;
 
     babelTraverse(ast, {
         Program: {
@@ -67,7 +69,23 @@ const extractI18nFromScript = (
                     path.stop();
                 }
             },
-            exit() {},
+            exit(path) {
+                removeI18N =
+                    keySet.size === 0 &&
+                    keySet.size !== Object.keys(currObj).length;
+                if (removeI18N) {
+                    path.node.body = path.node.body.filter((node) => {
+                        if (babelTypes.isImportDeclaration(node)) {
+                            return !node.specifiers.some(
+                                (spec) =>
+                                    babelTypes.isImportDefaultSpecifier(spec) &&
+                                    spec.local.name === importVariable,
+                            );
+                        }
+                        return true;
+                    });
+                }
+            },
         },
         MemberExpression(path) {
             let node = path.node;
@@ -94,15 +112,32 @@ const extractI18nFromScript = (
         },
     });
 
-    const newObj: Record<string, any> = currObj;
+    let amount = 0;
     Object.keys(currObj).forEach((key) => {
         if (!keySet.has(key)) {
-            delete newObj[key];
+            amount++;
+            delete currObj[key];
         }
     });
-    _.set(extractMap, fileKey, newObj);
 
-    const amount = Object.keys(currObj).length - Object.keys(newObj).length;
+    if (_.isEmpty(currObj)) {
+        let currKey = fileKey;
+        do {
+            _.unset(extractMap, currKey);
+            currKey = currKey.split('.').slice(0, -1).join('.');
+        } while (currKey && _.isEmpty(_.get(extractMap, currKey)));
+    } else {
+        _.set(extractMap, fileKey, currObj);
+    }
+
+    if (removeI18N) {
+        const { code } = generate(ast, {
+            retainLines: true,
+            comments: true,
+        });
+        fs.writeFileSync(fileName, code);
+    }
+
     return amount;
 };
 
