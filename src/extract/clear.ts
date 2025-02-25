@@ -9,6 +9,7 @@ import generate from '@babel/generator';
 import {
     generateLocaleKey,
     getFilteredFiles,
+    getLeafNodeCount,
     getProjectConfig,
     getSubDirectories,
     parseLocaleModule,
@@ -158,19 +159,25 @@ const clear = async () => {
     subDirs.map((lang) => {
         const filePath = path.join(localeDir, `${lang}/index.${type}`);
         parseLocaleModule(filePath).then((extractMap) => {
-            const amount = allFiles.reduce((amount, file) => {
-                try {
-                    const curr = extractI18nByFileType(file, extractMap);
-                    return amount + curr;
-                } catch (error: any) {
-                    updateLocaleContent(extractMap, filePath);
-                    throw new Error(
-                        `${filePath} 移除文案失败, ${error.message}`,
-                    );
-                }
-            }, 0);
+            const newExtractMap: Record<string, any> = {};
+            allFiles
+                .filter((file) => _.has(extractMap, generateLocaleKey(file)))
+                .forEach((file) => {
+                    const fileKey = generateLocaleKey(file);
+                    _.set(newExtractMap, fileKey, _.get(extractMap, fileKey));
+                    try {
+                        extractI18nByFileType(file, newExtractMap);
+                    } catch (error: any) {
+                        updateLocaleContent(newExtractMap, filePath);
+                        throw new Error(
+                            `${filePath} 移除文案失败, ${error.message}`,
+                        );
+                    }
+                });
+            const amount =
+                getLeafNodeCount(extractMap) - getLeafNodeCount(newExtractMap);
             success(`${filePath} 共移除${amount}个文案！`);
-            updateLocaleContent(extractMap, filePath);
+            updateLocaleContent(newExtractMap, filePath);
         });
     });
 };

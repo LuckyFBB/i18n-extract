@@ -338,3 +338,11 @@ export const parseLocaleModule = (filePath: string) => {
 
     return Promise.resolve(exportData);
 };
+
+/**
+ * 获取对象的叶子节点数
+ * @param obj 对象
+ * @returns number
+ */
+export const getLeafNodeCount = (obj: Record<string, any>): number =>
+    _.isObject(obj) ? _.sum(_.map(obj, getLeafNodeCount)) : 1;
