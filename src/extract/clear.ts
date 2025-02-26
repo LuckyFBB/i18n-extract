@@ -4,10 +4,12 @@ import _ from 'lodash';
 import { parse, ParserOptions } from '@babel/parser';
 import babelTraverse from '@babel/traverse';
 import * as babelTypes from '@babel/types';
+import generate from '@babel/generator';
 
 import {
     generateLocaleKey,
     getFilteredFiles,
+    getObjectLeafCount,
     getProjectConfig,
     getSubDirectories,
     parseLocaleModule,
@@ -49,6 +51,7 @@ const extractI18nFromScript = (
     const currObj = _.get(extractMap, fileKey);
     if (!currObj) return 0;
     const keySet = new Set<string>();
+    let removeI18N = false;
 
     babelTraverse(ast, {
         Program: {
@@ -67,7 +70,23 @@ const extractI18nFromScript = (
                     path.stop();
                 }
             },
-            exit() {},
+            exit(path) {
+                removeI18N =
+                    keySet.size === 0 &&
+                    keySet.size !== Object.keys(currObj).length;
+                if (removeI18N) {
+                    path.node.body = path.node.body.filter((node) => {
+                        if (babelTypes.isImportDeclaration(node)) {
+                            return !node.specifiers.some(
+                                (spec) =>
+                                    babelTypes.isImportDefaultSpecifier(spec) &&
+                                    spec.local.name === importVariable,
+                            );
+                        }
+                        return true;
+                    });
+                }
+            },
         },
         MemberExpression(path) {
             let node = path.node;
@@ -94,16 +113,29 @@ const extractI18nFromScript = (
         },
     });
 
-    const newObj: Record<string, any> = currObj;
     Object.keys(currObj).forEach((key) => {
         if (!keySet.has(key)) {
-            delete newObj[key];
+            delete currObj[key];
         }
     });
-    _.set(extractMap, fileKey, newObj);
 
-    const amount = Object.keys(currObj).length - Object.keys(newObj).length;
-    return amount;
+    if (_.isEmpty(currObj)) {
+        let currKey = fileKey;
+        do {
+            _.unset(extractMap, currKey);
+            currKey = currKey.split('.').slice(0, -1).join('.');
+        } while (currKey && _.isEmpty(_.get(extractMap, currKey)));
+    } else {
+        _.set(extractMap, fileKey, currObj);
+    }
+
+    if (removeI18N) {
+        const { code } = generate(ast, {
+            retainLines: true,
+            comments: true,
+        });
+        fs.writeFileSync(fileName, code);
+    }
 };
 
 const extractI18nByFileType = (
@@ -111,9 +143,8 @@ const extractI18nByFileType = (
     extractMap: Record<string, any>,
 ) => {
     if (['.js', '.ts', '.jsx', '.tsx'].some((ext) => fileName.endsWith(ext))) {
-        return extractI18nFromScript(fileName, extractMap);
+        extractI18nFromScript(fileName, extractMap);
     }
-    return 0;
 };
 
 const clear = async () => {
@@ -123,19 +154,26 @@ const clear = async () => {
     subDirs.map((lang) => {
         const filePath = path.join(localeDir, `${lang}/index.${type}`);
         parseLocaleModule(filePath).then((extractMap) => {
-            const amount = allFiles.reduce((amount, file) => {
-                try {
-                    const curr = extractI18nByFileType(file, extractMap);
-                    return amount + curr;
-                } catch (error: any) {
-                    updateLocaleContent(extractMap, filePath);
-                    throw new Error(
-                        `${filePath} 移除文案失败, ${error.message}`,
-                    );
-                }
-            }, 0);
+            const newExtractMap: Record<string, any> = {};
+            allFiles
+                .filter((file) => _.has(extractMap, generateLocaleKey(file)))
+                .forEach((file) => {
+                    const fileKey = generateLocaleKey(file);
+                    _.set(newExtractMap, fileKey, _.get(extractMap, fileKey));
+                    try {
+                        extractI18nByFileType(file, newExtractMap);
+                    } catch (error: any) {
+                        updateLocaleContent(newExtractMap, filePath);
+                        throw new Error(
+                            `${filePath} 移除文案失败, ${error.message}`,
+                        );
+                    }
+                });
+            const amount =
+                getObjectLeafCount(extractMap) -
+                getObjectLeafCount(newExtractMap);
             success(`${filePath} 共移除${amount}个文案！`);
-            updateLocaleContent(extractMap, filePath);
+            updateLocaleContent(newExtractMap, filePath);
         });
     });
 };
