@@ -9,7 +9,7 @@ import generate from '@babel/generator';
 import {
     generateLocaleKey,
     getFilteredFiles,
-    getLeafNodeCount,
+    getObjectLeafCount,
     getProjectConfig,
     getSubDirectories,
     parseLocaleModule,
@@ -113,10 +113,8 @@ const extractI18nFromScript = (
         },
     });
 
-    let amount = 0;
     Object.keys(currObj).forEach((key) => {
         if (!keySet.has(key)) {
-            amount++;
             delete currObj[key];
         }
     });
@@ -138,8 +136,6 @@ const extractI18nFromScript = (
         });
         fs.writeFileSync(fileName, code);
     }
-
-    return amount;
 };
 
 const extractI18nByFileType = (
@@ -147,9 +143,8 @@ const extractI18nByFileType = (
     extractMap: Record<string, any>,
 ) => {
     if (['.js', '.ts', '.jsx', '.tsx'].some((ext) => fileName.endsWith(ext))) {
-        return extractI18nFromScript(fileName, extractMap);
+        extractI18nFromScript(fileName, extractMap);
     }
-    return 0;
 };
 
 const clear = async () => {
@@ -175,7 +170,8 @@ const clear = async () => {
                     }
                 });
             const amount =
-                getLeafNodeCount(extractMap) - getLeafNodeCount(newExtractMap);
+                getObjectLeafCount(extractMap) -
+                getObjectLeafCount(newExtractMap);
             success(`${filePath} 共移除${amount}个文案！`);
             updateLocaleContent(newExtractMap, filePath);
         });

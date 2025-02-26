@@ -344,5 +344,5 @@ export const parseLocaleModule = (filePath: string) => {
  * @param obj 对象
  * @returns number
  */
-export const getLeafNodeCount = (obj: Record<string, any>): number =>
-    _.isObject(obj) ? _.sum(_.map(obj, getLeafNodeCount)) : 1;
+export const getObjectLeafCount = (obj: Record<string, any>): number =>
+    _.isObject(obj) ? _.sum(_.map(obj, getObjectLeafCount)) : 1;
