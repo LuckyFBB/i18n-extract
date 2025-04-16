@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.2.0...v1.3.0) (2025-04-16)
+
+
+### Features
+
+* 🎸 I18N.xxx not exist or file is deleted, delete the key in locales ([#7](https://github.com/LuckyFBB/i18n-extract/issues/7)) ([04022d0](https://github.com/LuckyFBB/i18n-extract/commit/04022d067da8665bd73f152d53b9a864daadefee)), closes [#6](https://github.com/LuckyFBB/i18n-extract/issues/6)
+* 🎸 support clear unused text in locale file ([#3](https://github.com/LuckyFBB/i18n-extract/issues/3)) ([5025e83](https://github.com/LuckyFBB/i18n-extract/commit/5025e831ae7888b006c01892526d466af5e3b2bd)), closes [#2](https://github.com/LuckyFBB/i18n-extract/issues/2)
+* 🎸 support fileType and sourceLocale in config.json ([#5](https://github.com/LuckyFBB/i18n-extract/issues/5)) ([270bffa](https://github.com/LuckyFBB/i18n-extract/commit/270bffaf36d3819f38a0c9e8b7e2e1723f123707)), closes [#4](https://github.com/LuckyFBB/i18n-extract/issues/4)
+
+
+### Bug Fixes
+
+* 🐛 change init locale config content by fileType ([947c8b5](https://github.com/LuckyFBB/i18n-extract/commit/947c8b53ef9cb8e41fe295aba41f3976833ef113))
+
 ## [1.2.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.1.0...v1.2.0) (2025-02-20)
 
 

@@ -1,6 +1,6 @@
 {
     "name": "i18n-extract-cli",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "description": "used to extract chinese in a project",
     "main": "index.js",
     "repository": {
@@ -14,7 +14,7 @@
         "dev": "tsc -w",
         "build": "tsc",
         "prettier": "prettier --write ./",
-        "release": "standard-version"
+        "release": "pnpm build && standard-version"
     },
     "keywords": [
         "i18n"
