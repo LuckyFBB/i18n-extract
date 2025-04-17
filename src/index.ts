@@ -6,6 +6,7 @@ import extract from './extract';
 import validateI18nCoverage from './extract/check';
 import init from './init';
 import clear from './extract/clear';
+import toLocal from './extract/toLocal';
 
 const program = new Command();
 
@@ -25,5 +26,10 @@ program
     .command('extract:clear')
     .description('clear unused key in locale file')
     .action(clear);
+
+program
+    .command('extract:local')
+    .description('transform I18N to locale text')
+    .action(toLocal);
 
 program.parse(process.argv);
