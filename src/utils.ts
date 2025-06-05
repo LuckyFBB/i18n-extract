@@ -4,7 +4,7 @@ import slash from 'slash2';
 import * as fs from 'fs';
 import * as path from 'path';
 import { parse } from '@babel/parser';
-import traverse from '@babel/traverse';
+import traverse, { NodePath } from '@babel/traverse';
 import * as babelTypes from '@babel/types';
 import generate from '@babel/generator';
 
@@ -346,3 +346,70 @@ export const parseLocaleModule = (filePath: string) => {
  */
 export const getObjectLeafCount = (obj: Record<string, any>): number =>
     _.isObject(obj) ? _.sum(_.map(obj, getObjectLeafCount)) : 1;
+
+/**
+ * 检查节点是否应该被忽略（通过 @i18n-ignore 注释）
+ */
+export const shouldIgnoreNode = (
+    path: NodePath,
+    sourceCode: string,
+): boolean => {
+    const { node } = path;
+
+    // 检查当前节点的前置注释
+    if (node.leadingComments) {
+        const hasIgnoreComment = node.leadingComments.some(
+            (comment: any) => comment.value.trim() === '@i18n-ignore',
+        );
+        if (hasIgnoreComment) return true;
+    }
+
+    // 检查父节点的前置注释（处理某些语法结构，如变量声明）
+    let currentPath = path.parentPath;
+    while (currentPath) {
+        const parentNode = currentPath.node;
+        if (parentNode.leadingComments) {
+            const hasIgnoreComment = parentNode.leadingComments.some(
+                (comment: any) => comment.value.trim() === '@i18n-ignore',
+            );
+            if (hasIgnoreComment) return true;
+        }
+
+        // 只检查直接相关的父节点，避免过度检查
+        if (
+            babelTypes.isVariableDeclarator(parentNode) ||
+            babelTypes.isVariableDeclaration(parentNode) ||
+            babelTypes.isObjectProperty(parentNode) ||
+            babelTypes.isObjectExpression(parentNode) ||
+            babelTypes.isJSXElement(parentNode) ||
+            babelTypes.isSpreadElement(parentNode) ||
+            babelTypes.isArrayExpression(parentNode) ||
+            babelTypes.isCallExpression(parentNode)
+        ) {
+            currentPath = currentPath.parentPath;
+        } else {
+            break;
+        }
+    }
+
+    // 检查上一行是否包含 @i18n-ignore 注释
+    const nodeLine = node.loc?.start.line;
+    if (sourceCode && nodeLine) {
+        const lines = sourceCode.split('\n');
+        const previousLineIndex = nodeLine - 2; // 行号从1开始
+
+        if (previousLineIndex >= 0) {
+            const previousLine = lines[previousLineIndex];
+            if (
+                previousLine &&
+                (previousLine.includes('// @i18n-ignore') ||
+                    previousLine.includes('/* @i18n-ignore') ||
+                    previousLine.includes('{/* @i18n-ignore'))
+            ) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+};

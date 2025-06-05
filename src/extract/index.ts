@@ -18,6 +18,7 @@ import {
     setLocaleValue,
     getSortKey,
     parseLocaleModule,
+    shouldIgnoreNode,
 } from '../utils';
 
 const {
@@ -42,17 +43,24 @@ const extractI18nFromScript = (fileName: string, extractMap: any) => {
     const ast = parse(sourceCode, {
         sourceType: 'module',
         plugins,
+        attachComment: true,
     });
 
     const fileKey = generateLocaleKey(fileName);
     const obj: {} = _.get(extractMap, fileKey) ?? {};
     let haveMoreTemplate = false;
     let count = 0;
+    const hasIgnoreCommentInFile = sourceCode.includes('@i18n-ignore');
 
     babelTraverse(ast, {
         StringLiteral(path) {
             const { node } = path;
             const { value } = node;
+
+            if (hasIgnoreCommentInFile && shouldIgnoreNode(path, sourceCode)) {
+                return;
+            }
+
             if (
                 !value.match(DOUBLE_BYTE_REGEX) ||
                 (babelTypes.isCallExpression(path.parent) &&
@@ -72,6 +80,11 @@ const extractI18nFromScript = (fileName: string, extractMap: any) => {
             const { node } = path;
             const { start, end } = node;
             if (!start || !end) return;
+
+            if (hasIgnoreCommentInFile && shouldIgnoreNode(path, sourceCode)) {
+                return;
+            }
+
             let templateContent = sourceCode.slice(start + 1, end - 1);
             if (
                 !templateContent.match(DOUBLE_BYTE_REGEX) ||
@@ -128,6 +141,11 @@ const extractI18nFromScript = (fileName: string, extractMap: any) => {
         },
         JSXText(path) {
             const { value } = path.node;
+
+            if (hasIgnoreCommentInFile && shouldIgnoreNode(path, sourceCode)) {
+                return;
+            }
+
             if (value.match(DOUBLE_BYTE_REGEX)) {
                 count++;
                 const key = getSortKey(count, obj);
@@ -139,6 +157,11 @@ const extractI18nFromScript = (fileName: string, extractMap: any) => {
         },
         JSXAttribute(path) {
             const { node } = path;
+
+            if (hasIgnoreCommentInFile && shouldIgnoreNode(path, sourceCode)) {
+                return;
+            }
+
             if (
                 babelTypes.isStringLiteral(node.value) &&
                 node.value.value.match(DOUBLE_BYTE_REGEX)
@@ -157,6 +180,11 @@ const extractI18nFromScript = (fileName: string, extractMap: any) => {
         },
         TSUnionType(path) {
             const { types } = path.node;
+
+            if (hasIgnoreCommentInFile && shouldIgnoreNode(path, sourceCode)) {
+                return;
+            }
+
             const newTypes = types.map((node) => {
                 if (
                     babelTypes.isTSLiteralType(node) &&
