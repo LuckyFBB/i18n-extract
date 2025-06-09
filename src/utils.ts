@@ -413,3 +413,23 @@ export const shouldIgnoreNode = (
 
     return false;
 };
+
+/**
+ * 递归合并两个语言包对象，保持目标对象中已有的翻译不变，只添加新的 key
+ * @param {Object} source - 源语言包对象，包含所有需要同步的 key
+ * @param {Object} target - 目标语言包对象，需要同步新 key 的对象
+ */
+export const mergeLocaleMap = (source: any, target: any) => {
+    Object.keys(source).forEach((key) => {
+        if (typeof source[key] === 'object' && source[key] !== null) {
+            if (!target[key]) {
+                target[key] = {};
+            }
+            mergeLocaleMap(source[key], target[key]);
+        } else {
+            if (!target[key]) {
+                target[key] = source[key];
+            }
+        }
+    });
+};

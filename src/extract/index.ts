@@ -19,6 +19,7 @@ import {
     getSortKey,
     parseLocaleModule,
     shouldIgnoreNode,
+    mergeLocaleMap,
 } from '../utils';
 
 const {
@@ -261,11 +262,15 @@ const extractI18nByFileType = (fileName: string, extractMap: any) => {
 };
 
 const extract = async () => {
-    const targetFilename = path.join(
+    const localeDirs = fs
+        .readdirSync(localeDir)
+        .filter((dir) => fs.statSync(path.join(localeDir, dir)).isDirectory());
+
+    const sourceFilename = path.join(
         localeDir,
         `${sourceLocale}/index.${type}`,
     );
-    const extractMap = await parseLocaleModule(targetFilename);
+    const extractMap = await parseLocaleModule(sourceFilename);
     const filteredFiles = getFilteredFiles(extractDir, excludeDir, excludeFile);
     const amount = filteredFiles.reduce((amount, file) => {
         try {
@@ -277,7 +282,14 @@ const extract = async () => {
         }
     }, 0);
     success(`共提取${amount}处文案！`);
-    updateLocaleContent(extractMap);
+
+    // 更新所有语言包
+    for (const locale of localeDirs) {
+        const targetFilename = path.join(localeDir, `${locale}/index.${type}`);
+        const localeMap = await parseLocaleModule(targetFilename);
+        mergeLocaleMap(extractMap, localeMap);
+        updateLocaleContent(localeMap, targetFilename);
+    }
 };
 
 export default extract;
