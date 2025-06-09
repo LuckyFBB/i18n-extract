@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.3.0...v1.4.0) (2025-06-09)
+
+
+### Features
+
+* 🎸 support [@i18n-ignore](https://github.com/i18n-ignore) ([#12](https://github.com/LuckyFBB/i18n-extract/issues/12)) ([e495d23](https://github.com/LuckyFBB/i18n-extract/commit/e495d23c75504c686fa49bf6a97e47506aac7e27))
+* 🎸 support extract chinese to all localeDir ([#14](https://github.com/LuckyFBB/i18n-extract/issues/14)) ([037f4f1](https://github.com/LuckyFBB/i18n-extract/commit/037f4f156ec21c583c50d417acac3ac45c259cd7))
+* 🎸 support I18N to local ([#9](https://github.com/LuckyFBB/i18n-extract/issues/9)) ([243d462](https://github.com/LuckyFBB/i18n-extract/commit/243d4624c207f91bc1cb673836dad4968280c9bd))
+
 ## [1.3.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.2.0...v1.3.0) (2025-04-16)
 
 
