@@ -20,6 +20,7 @@ import {
     parseLocaleModule,
     shouldIgnoreNode,
     mergeLocaleMap,
+    info,
 } from '../utils';
 
 const {
@@ -34,6 +35,15 @@ const {
 
 const extractI18nFromScript = (fileName: string, extractMap: any) => {
     const sourceCode = fs.readFileSync(fileName, 'utf-8');
+
+    if (
+        sourceCode.startsWith('// @i18n-file-ignore') ||
+        sourceCode.startsWith('/* @i18n-file-ignore')
+    ) {
+        info('已忽略文件:' + fileName);
+        return 0;
+    }
+
     const plugins: ParserOptions['plugins'] = [
         'decorators-legacy',
         'typescript',

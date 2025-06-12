@@ -23,6 +23,15 @@ const validateI18nCoverage = () => {
     let hasZh = false;
     allFiles.forEach((filePath) => {
         let content = fs.readFileSync(filePath, 'utf-8');
+
+        if (
+            content.startsWith('// @i18n-file-ignore') ||
+            content.startsWith('/* @i18n-file-ignore')
+        ) {
+            info('已忽略文件:' + filePath);
+            return;
+        }
+
         content = content.replace(commentRegex, (match) => {
             return /@i18n-ignore/.test(match) ? match : '';
         });

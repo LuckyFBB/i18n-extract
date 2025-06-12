@@ -392,10 +392,37 @@ export const shouldIgnoreNode = (
         }
     }
 
+    const lines = sourceCode.split('\n');
+
+    // 特殊处理JSX文本节点：检查前一个兄弟节点是否包含 @i18n-ignore 的JSX注释
+    if (babelTypes.isJSXText(node)) {
+        const prevSibling = path.getPrevSibling();
+        if (
+            prevSibling &&
+            babelTypes.isJSXExpressionContainer(prevSibling.node)
+        ) {
+            const expression = prevSibling.node.expression;
+            if (babelTypes.isJSXEmptyExpression(expression)) {
+                const prevSiblingLine = prevSibling.node.loc?.start.line;
+                if (sourceCode && prevSiblingLine) {
+                    const commentLineIndex = prevSiblingLine - 1;
+                    if (commentLineIndex >= 0) {
+                        const commentLine = lines[commentLineIndex];
+                        if (
+                            commentLine &&
+                            commentLine.includes('@i18n-ignore')
+                        ) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // 检查上一行是否包含 @i18n-ignore 注释
     const nodeLine = node.loc?.start.line;
     if (sourceCode && nodeLine) {
-        const lines = sourceCode.split('\n');
         const previousLineIndex = nodeLine - 2; // 行号从1开始
 
         if (previousLineIndex >= 0) {
