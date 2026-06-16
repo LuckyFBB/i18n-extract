@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.4.0...v1.5.0) (2026-06-16)
+
+
+### Features
+
+* 🎸 add i18n reference prefix validation and optimize detection logic ([#18](https://github.com/LuckyFBB/i18n-extract/issues/18)) ([8dbf871](https://github.com/LuckyFBB/i18n-extract/commit/8dbf8715e4883bb959bf9038bd22fedcf33f2891))
+* 🎸 support [@i18n-file-ignore](https://github.com/i18n-file-ignore) ([#16](https://github.com/LuckyFBB/i18n-extract/issues/16)) ([0ac2157](https://github.com/LuckyFBB/i18n-extract/commit/0ac2157bc9acf0f014b5167ee4fe8a8a745e068b))
+
 ## [1.4.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.3.0...v1.4.0) (2025-06-09)
 
 
