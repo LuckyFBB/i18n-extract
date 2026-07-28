@@ -6,7 +6,8 @@ import extract from './extract';
 import validateI18nCoverage from './extract/check';
 import init from './init';
 import clear from './extract/clear';
-import toLocal from './extract/toLocal';
+import checkFix from './extract/checkFix';
+import restore from './restore';
 
 const program = new Command();
 
@@ -23,13 +24,18 @@ program
     .action(validateI18nCoverage);
 
 program
+    .command('extract:check:fix')
+    .description('fix invalid i18n references by restoring to Chinese')
+    .action(checkFix);
+
+program
     .command('extract:clear')
     .description('clear unused key in locale file')
     .action(clear);
 
 program
-    .command('extract:local')
-    .description('transform I18N to locale text')
-    .action(toLocal);
+    .command('restore [file]')
+    .description('restore I18N references back to Chinese text')
+    .action(restore);
 
 program.parse(process.argv);
