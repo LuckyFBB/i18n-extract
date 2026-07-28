@@ -348,6 +348,27 @@ export const getObjectLeafCount = (obj: Record<string, any>): number =>
     _.isObject(obj) ? _.sum(_.map(obj, getObjectLeafCount)) : 1;
 
 /**
+ * Remove a dotted key from a map and prune any ancestors that become empty
+ * as a result. Stops at the first non-empty ancestor.
+ *
+ * @param map The map to modify in place.
+ * @param key Dotted key path (e.g., 'pages.demo').
+ * @returns true if the key was found and removed.
+ */
+export const pruneEmptyAncestors = (
+    map: Record<string, any>,
+    key: string,
+): boolean => {
+    if (!_.has(map, key)) return false;
+    let currKey = key;
+    do {
+        _.unset(map, currKey);
+        currKey = currKey.split('.').slice(0, -1).join('.');
+    } while (currKey && _.isEmpty(_.get(map, currKey)));
+    return true;
+};
+
+/**
  * 检查节点是否应该被忽略（通过 @i18n-ignore 注释）
  */
 export const shouldIgnoreNode = (
