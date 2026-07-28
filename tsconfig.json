@@ -13,5 +13,5 @@
         "sourceMap": true
     },
     "include": ["src/**/*"], // 包含的文件
-    "exclude": ["node_modules", "dist"] // 排除的文件
+    "exclude": ["node_modules", "dist", "tests", "vitest.config.ts"] // 排除的文件
 }

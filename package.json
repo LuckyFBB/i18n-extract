@@ -14,7 +14,9 @@
         "dev": "tsc -w",
         "build": "tsc",
         "prettier": "prettier --write ./",
-        "release": "pnpm build && standard-version"
+        "release": "pnpm build && standard-version",
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
     "keywords": [
         "i18n"
@@ -48,7 +50,8 @@
         "lint-staged": "^15.3.0",
         "prettier": "^3.4.2",
         "standard-version": "^9.5.0",
-        "typescript": "^5.7.2"
+        "typescript": "^5.7.2",
+        "vitest": "^4.1.10"
     },
     "dependencies": {
         "@babel/generator": "^7.26.3",
