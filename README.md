@@ -47,7 +47,7 @@ i18n extract:check
 
 ## 修复非法 i18n 引用
 ```shell
-i18n extract:check:fix
+i18n extract:check --fix
 ```
 将 `extract:check` 检测到的非法 i18n 变量引用还原回中文，并清理语言包中的废弃 key。修复后可重新执行 `i18n extract` 生成正确的引用。
 

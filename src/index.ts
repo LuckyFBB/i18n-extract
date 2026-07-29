@@ -21,12 +21,14 @@ program
 program
     .command('extract:check')
     .description('check chinese in files')
-    .action(validateI18nCoverage);
-
-program
-    .command('extract:check:fix')
-    .description('fix invalid i18n references by restoring to Chinese')
-    .action(checkFix);
+    .option('--fix', 'fix invalid i18n references by restoring to Chinese')
+    .action((options) => {
+        if (options.fix) {
+            checkFix();
+        } else {
+            validateI18nCoverage();
+        }
+    });
 
 program
     .command('extract:clear')
