@@ -17,8 +17,11 @@ export interface InvalidI18nRef {
 export interface InlineResult {
     inlinedCount: number;
     notFoundKeys: string[];
+    /** 文件里是否还有没能内联的 I18N 引用残留 */
     hasRemainingRefs: boolean;
     unsupportedCalls: Array<{ line: number; key: string }>;
+    /** I18N 的 import 语句是否被删除 */
+    importRemoved: boolean;
 }
 
 const getImportVariable = (): string => {
@@ -173,6 +176,7 @@ export const inlineI18nReferences = (
     const notFoundKeys: string[] = [];
     let hasRemainingRefs = false;
     const unsupportedCalls: Array<{ line: number; key: string }> = [];
+    let importRemoved = false;
 
     babelTraverse(ast, {
         Program: {
@@ -193,6 +197,7 @@ export const inlineI18nReferences = (
             },
             exit(path) {
                 if (!hasRemainingRefs) {
+                    const originalLength = path.node.body.length;
                     path.node.body = path.node.body.filter((node) => {
                         if (babelTypes.isImportDeclaration(node)) {
                             return !node.specifiers.some(
@@ -203,6 +208,9 @@ export const inlineI18nReferences = (
                         }
                         return true;
                     });
+                    if (path.node.body.length !== originalLength) {
+                        importRemoved = true;
+                    }
                 }
             },
         },
@@ -371,5 +379,11 @@ export const inlineI18nReferences = (
         },
     });
 
-    return { inlinedCount, notFoundKeys, hasRemainingRefs, unsupportedCalls };
+    return {
+        inlinedCount,
+        notFoundKeys,
+        hasRemainingRefs,
+        unsupportedCalls,
+        importRemoved,
+    };
 };

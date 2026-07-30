@@ -410,3 +410,106 @@ const b = I18N.get(I18N.utils.domI18n.D, {
         expect(out).toContain('import I18N');
     });
 });
+
+describe('inlineI18nReferences: importRemoved flag', () => {
+    test('importRemoved is true when I18N import is removed (all refs inlined)', () => {
+        const code = `import I18N from '@/utils/i18n';
+const x = I18N.pages.demo.key1;`;
+        const extractMap = { pages: { demo: { key1: '你好' } } };
+        const ast = parseFile(code, true);
+        const result = inlineI18nReferences(
+            ast,
+            extractMap,
+            'src/pages/demo.tsx',
+            'all',
+            code,
+        );
+        expect(result.importRemoved).toBe(true);
+    });
+
+    test('importRemoved is false when file has no I18N import', () => {
+        const code = `const x = 'hello';`;
+        const extractMap = {};
+        const ast = parseFile(code, true);
+        const result = inlineI18nReferences(
+            ast,
+            extractMap,
+            'src/pages/demo.tsx',
+            'all',
+            code,
+        );
+        expect(result.importRemoved).toBe(false);
+    });
+
+    test('importRemoved is false when refs remain (key not in locale)', () => {
+        const code = `import I18N from '@/utils/i18n';
+const x = I18N.pages.demo.missing;`;
+        const extractMap = { pages: { demo: {} } };
+        const ast = parseFile(code, true);
+        const result = inlineI18nReferences(
+            ast,
+            extractMap,
+            'src/pages/demo.tsx',
+            'all',
+            code,
+        );
+        expect(result.hasRemainingRefs).toBe(true);
+        expect(result.importRemoved).toBe(false);
+    });
+
+    test('importRemoved is false when unsupported I18N.get() keeps import', () => {
+        const code = `import I18N from '@/utils/i18n';
+const x = I18N.get(I18N.utils.domI18n.D, {
+    val1: count,
+    BlueText: (chunks) => <BlueText>{chunks}</BlueText>,
+});`;
+        const extractMap = {
+            utils: {
+                domI18n: { D: '已选择 <BlueText>{val1}</BlueText> 条数据' },
+            },
+        };
+        const ast = parseFile(code, true);
+        const result = inlineI18nReferences(
+            ast,
+            extractMap,
+            'src/utils/dom.tsx',
+            'all',
+            code,
+        );
+        expect(result.hasRemainingRefs).toBe(true);
+        expect(result.importRemoved).toBe(false);
+    });
+
+    test('importRemoved is true in invalid-only mode when all refs inlined', () => {
+        const code = `import I18N from '@/utils/i18n';
+const x = I18N.otherPage.key1;`;
+        const extractMap = { otherPage: { key1: '你好' } };
+        const ast = parseFile(code, true);
+        const result = inlineI18nReferences(
+            ast,
+            extractMap,
+            'src/pages/demo.tsx',
+            'invalid-only',
+            code,
+        );
+        expect(result.importRemoved).toBe(true);
+    });
+});
+
+describe('inlineI18nReferences: I18N.get() with JSX element params', () => {
+    test('does not crash when params contain JSX elements', () => {
+        const code = `import I18N from '@/utils/i18n';
+const x = I18N.get(I18N.pages.demo.key1, { el: <div /> });`;
+        const extractMap = { pages: { demo: { key1: '你好{el}' } } };
+        const ast = parseFile(code, true);
+        expect(() =>
+            inlineI18nReferences(
+                ast,
+                extractMap,
+                'src/pages/demo.tsx',
+                'all',
+                code,
+            ),
+        ).not.toThrow();
+    });
+});

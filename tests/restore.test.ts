@@ -88,6 +88,25 @@ const x = I18N.pages.demo.key1;`,
         expect(project.readFile('locales/zh-CN/index.ts')).toContain('你好');
     });
 
+    test('does not rewrite plain file without I18N import (preserves formatting byte-for-byte)', async () => {
+        // Babel's generator would alter formatting (e.g. trailing newline) if
+        // it regenerated the file, so byte equality proves the file was not
+        // touched.
+        const plainContent = `const x = "hello";\nexport default x;\n`;
+        project.writeFile('src/utils/plain.ts', plainContent);
+        project.writeFile(
+            'locales/zh-CN/index.ts',
+            tsLocaleContent({ pages: { demo: { key1: '你好' } } }),
+        );
+
+        const { default: restore } = await importRestore();
+        await restore('src/utils/plain.ts');
+
+        expect(project.readFile('src/utils/plain.ts')).toBe(plainContent);
+        // locale unchanged
+        expect(project.readFile('locales/zh-CN/index.ts')).toContain('你好');
+    });
+
     test('errors when file does not exist', async () => {
         project.writeFile('locales/zh-CN/index.ts', tsLocaleContent({}));
         const { default: restore } = await importRestore();
@@ -279,6 +298,34 @@ const x = I18N.pages.demo.key1;`,
         expect(project.readFile('src/pages/plain.ts')).toContain(
             `const x = 'no i18n here';`,
         );
+
+        // demo's fileKey removed from locale
+        expect(project.readFile('locales/zh-CN/index.ts')).not.toContain(
+            'demo',
+        );
+    });
+
+    test('does not rewrite plain files without I18N import (preserves formatting byte-for-byte)', async () => {
+        const plainContent = `const x = "no i18n here";\nexport default x;\n`;
+        project.writeFile('src/pages/plain.ts', plainContent);
+        project.writeFile(
+            'src/pages/demo.tsx',
+            `import I18N from '@/utils/i18n';
+const x = I18N.pages.demo.key1;`,
+        );
+        project.writeFile(
+            'locales/zh-CN/index.ts',
+            tsLocaleContent({ pages: { demo: { key1: '你好' } } }),
+        );
+
+        const { default: restore } = await importRestore();
+        await restore();
+
+        // demo.tsx inlined
+        expect(project.readFile('src/pages/demo.tsx')).toContain(`'你好'`);
+        // plain.ts untouched byte-for-byte (Babel's generator would alter
+        // formatting such as the trailing newline if it regenerated the file)
+        expect(project.readFile('src/pages/plain.ts')).toBe(plainContent);
 
         // demo's fileKey removed from locale
         expect(project.readFile('locales/zh-CN/index.ts')).not.toContain(

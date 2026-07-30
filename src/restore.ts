@@ -59,7 +59,7 @@ const restoreFile = (
         sourceCode,
     );
 
-    if (result.inlinedCount > 0 || !result.hasRemainingRefs) {
+    if (result.inlinedCount > 0 || result.importRemoved) {
         const { code } = generate(ast, {
             retainLines: true,
             comments: true,
