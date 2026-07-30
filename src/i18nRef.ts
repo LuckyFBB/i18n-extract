@@ -144,7 +144,7 @@ const getIdentifiers = (node: babelTypes.MemberExpression): string[] => {
 const extractObjectValuesFromCode = (code: string): string[] => {
     const ast = parse(`const x = ${code}`, {
         sourceType: 'module',
-        plugins: ['typescript'],
+        plugins: ['typescript', 'jsx'],
     });
     const values: string[] = [];
     const declaration = ast.program.body[0];
