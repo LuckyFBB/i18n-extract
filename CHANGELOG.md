@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.5.0...v1.6.0) (2026-07-31)
+
+
+### Features
+
+* [#19](https://github.com/LuckyFBB/i18n-extract/issues/19) register restore and check fix commands ([#20](https://github.com/LuckyFBB/i18n-extract/issues/20)) ([a32ce3a](https://github.com/LuckyFBB/i18n-extract/commit/a32ce3acd253b7942e2d026add94dcbba5691f3f))
+
 ## [1.5.0](https://github.com/LuckyFBB/i18n-extract/compare/v1.4.0...v1.5.0) (2026-06-16)
 
 
