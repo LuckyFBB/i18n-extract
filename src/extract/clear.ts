@@ -13,6 +13,7 @@ import {
     getProjectConfig,
     getSubDirectories,
     parseLocaleModule,
+    pruneEmptyAncestors,
     success,
     updateLocaleContent,
 } from '../utils';
@@ -120,11 +121,7 @@ const extractI18nFromScript = (
     });
 
     if (_.isEmpty(currObj)) {
-        let currKey = fileKey;
-        do {
-            _.unset(extractMap, currKey);
-            currKey = currKey.split('.').slice(0, -1).join('.');
-        } while (currKey && _.isEmpty(_.get(extractMap, currKey)));
+        pruneEmptyAncestors(extractMap, fileKey);
     } else {
         _.set(extractMap, fileKey, currObj);
     }
@@ -147,19 +144,25 @@ const extractI18nByFileType = (
     }
 };
 
-const clear = async () => {
+export const runClear = async (): Promise<{ removedCount: number }> => {
     const allFiles = getFilteredFiles(extractDir, excludeDir, excludeFile);
     const subDirs = await getSubDirectories(localeDir);
 
-    subDirs.map((lang) => {
-        const filePath = path.join(localeDir, `${lang}/index.${type}`);
-        parseLocaleModule(filePath).then((extractMap) => {
+    let totalRemoved = 0;
+    await Promise.all(
+        subDirs.map(async (lang) => {
+            const filePath = path.join(localeDir, `${lang}/index.${type}`);
+            const extractMap = await parseLocaleModule(filePath);
             const newExtractMap: Record<string, any> = {};
             allFiles
                 .filter((file) => _.has(extractMap, generateLocaleKey(file)))
                 .forEach((file) => {
                     const fileKey = generateLocaleKey(file);
-                    _.set(newExtractMap, fileKey, _.get(extractMap, fileKey));
+                    _.set(
+                        newExtractMap,
+                        fileKey,
+                        _.cloneDeep(_.get(extractMap, fileKey)),
+                    );
                     try {
                         extractI18nByFileType(file, newExtractMap);
                     } catch (error: any) {
@@ -174,8 +177,15 @@ const clear = async () => {
                 getObjectLeafCount(newExtractMap);
             success(`${filePath} 共移除${amount}个文案！`);
             updateLocaleContent(newExtractMap, filePath);
-        });
-    });
+            totalRemoved += amount;
+        }),
+    );
+
+    return { removedCount: totalRemoved };
+};
+
+const clear = async () => {
+    await runClear();
 };
 
 export default clear;
